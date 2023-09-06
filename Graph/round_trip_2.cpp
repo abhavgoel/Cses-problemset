@@ -81,93 +81,82 @@ class DSU{
     }
 };
 
-
-bool cycle(int node,int parent,vector<int>&vis,vector<vector<int>>&graph,vector<int>&path)
+int start,endd;
+vector<ll>cycle;
+bool dfs(int node ,vector<int>&vis,vector<int>&pathvis,vector<vector<int>>&graph)
 {
   vis[node]=1;
-  path.pb(node);
+  pathvis[node]=1;
+  cycle.pb(node);
   for(auto it:graph[node])
   {
-     
     if(vis[it]==0)
     {
-      
-      if(cycle(it,node,vis,graph,path)==true)
+      if(dfs(it,vis,pathvis,graph)==true)
       {
         return true;
       }
     }
-    else if(vis[it]==1 && it!=parent)
-    {
-      path.pb(it);
-      return true;
-    }
-   
+      else if(vis[it]==1 && pathvis[it]==1)
+      {
+        cycle.pb(it);
+        return true;
+      }
+    
   }
-  path.pop_back();
-   
+  cycle.pop_back();
+  pathvis[node]=0;
   return false;
 }
 void solve()
 {
-  int n,m;
+  ll n,m;
   cin>>n>>m;
+
   vector<vector<int>>graph(n+1);
 
   for(int i=0;i<m;i++)
   {
-    int u,v;
+    ll u,v;
     cin>>u>>v;
-
     graph[u].pb(v);
-    graph[v].pb(u);
-
   }
-  vector<int>vis(n+1);
-  // we have to print a cycle
-  vector<int>path;
+  vector<int>parent(n+1);
+  vector<int>vis(n+1),pathvis(n+1);
   for(int i=1;i<=n;i++)
   {
-    if(vis[i]==0)
+    if(vis[i]==0 && dfs(i,vis,pathvis,graph)==true)
     {
-      if(cycle(i,-1,vis,graph,path) == true)
+      int temp = cycle.back();
+      vector<int>ans;
+      int ind=-1;
+      for(int j=0;j<cycle.size();j++)
       {
-        // cout<<"cyle";
-        vector<int>ans;
-        int lastnode = path.back();
-        int ind=-1;
-        for(int i=0;i<path.size();i++)
+        if(cycle[j]==temp)
         {
-          if(path[i]==lastnode)
-          {
-            ind = i;
-            break;
-          }
+          ind=j;
+          break;
         }
-
-        for(int i=ind;i<path.size();i++)
-          ans.pb(path[i]);
-        cout<<ans.size()<<nline;
-        for(auto i:ans)
-          cout<<i<<" ";
-        
-        return;
       }
+
+      ans.assign(cycle.begin()+ind,cycle.end());
+      cout<<ans.size()<<nline;
+      for(auto j:ans)
+        cout<<j<<" ";
+      return ;
     }
   }
 
-  cout<<"IMPOSSIBLE"<<nline;
+  cout<<"IMPOSSIBLE";
   return;
-  
 }
  
 int main()
 {
   flash
-  
   auto start1 = high_resolution_clock::now();
-    // test
-    solve();
+  // test
+  solve();
   auto stop1 = high_resolution_clock::now();
   auto duration = duration_cast<microseconds>(stop1 - start1);
   cerr << "Time in miliseconds: " << duration.count() / 1000 << endl;
