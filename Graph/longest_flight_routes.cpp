@@ -82,24 +82,40 @@ class DSU{
 };
 
 
-vector<ll> topo(vector<ll>&indegree,vector<vector<ll>>&graph)
+void solve()
 {
-  vector<ll>topoSort;
+
+    //can also be done by normal bfs
+  ll n,m;
+  cin>>n>>m;
+  vector<vector<int>>graph(n+1);
+  vector<ll>indegree(n+1);
+
+  for(int i=0;i<m;i++)
+  {
+    int u,v;
+    cin>>u>>v;
+    graph[u].pb(v);
+    indegree[v]++;
+
+  }
+
+  vector<ll>dist(n+1,0);
+  vector<ll>parent(n+1);
+
+
   queue<ll>q;
   for(int i=1;i<indegree.size();i++)
   {
     if(indegree[i]==0)
       q.push(i);
   }
-
+  vector<ll>topo;
   while(!q.empty())
   {
-    auto it = q.front();
+    ll node = q.front();
     q.pop();
-
-    ll node = it;
-
-    topoSort.pb(it);
+    topo.pb(node);
 
     for(auto i:graph[node])
     {
@@ -109,40 +125,66 @@ vector<ll> topo(vector<ll>&indegree,vector<vector<ll>>&graph)
         q.push(i);
       }
     }
-
   }
-  return topoSort;
 
-}
-void solve()
-{
-  ll n,m;
-  cin>>n>>m;
+  // for(int i=0;i<topo.size();i++)
+  //   cout<<topo[i]<<" ";
+  // cout<<nline;
 
-  vector<vector<ll>>graph(n+1);
-  vector<ll>indegree(n+1);
+  // ll src_ind;
+  // for(int i=0;i<topo.size();i++)
+  //   if(topo[i]==1)
+  //   {
+  //     src_ind=i;
+  //     break;
+  //   }
 
-  loop(m)
+  vector<ll>dp(n+1,LONG_MIN);
+  dp[1]=0;
+  for(int i=0;i<topo.size();i++)
   {
-    ll u,v;
-    cin>>u>>v;
-    graph[u].pb(v);
-    indegree[v]++;
-
+    // if(i<src_ind)continue;
+    ll u = topo[i];
+    for(auto v:graph[u])
+    {
+      //u-->v
+      if(1+dp[u]>dp[v])
+      {
+        dp[v]=1+dp[u];
+        parent[v]=u;
+      }
+    }
   }
-  vector<ll>vis(n+1);
-  vector<ll>topoSort = topo(indegree,graph);
+  
 
-  if(topoSort.size() == n)
+  // for(auto i:parent)
+  //   cout<<i<<" ";
+  // cout<<dist[n];
+  if(dp[n]<=0)
   {
-    for(auto i:topoSort)
+    cout<<"IMPOSSIBLE";
+    return;
+  }
+  else
+  {
+    cout<<dp[n]+1<<nline;
+    vector<ll>ans;
+    ll k = n;
+    while(k!=1)
+    {
+      ans.pb(k);
+      k=parent[k];
+    }
+    ans.pb(1);
+    reverse(begin(ans),end(ans));
+    for(auto i:ans)
       cout<<i<<" ";
+
   }
-  else cout<<"IMPOSSIBLE";
+  
 
 
 }
- 
 int main()
 {
   flash

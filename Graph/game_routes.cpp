@@ -81,37 +81,29 @@ class DSU{
     }
 };
 
-
-vector<ll> topo(vector<ll>&indegree,vector<vector<ll>>&graph)
+vector<ll>toposort(vector<vector<ll>>&graph,vector<ll>&indegree)
 {
-  vector<ll>topoSort;
   queue<ll>q;
   for(int i=1;i<indegree.size();i++)
-  {
     if(indegree[i]==0)
       q.push(i);
-  }
 
+  vector<ll>topo;
   while(!q.empty())
   {
-    auto it = q.front();
+    ll node = q.front();
     q.pop();
+    topo.pb(node);
 
-    ll node = it;
-
-    topoSort.pb(it);
-
-    for(auto i:graph[node])
+    for(auto it:graph[node])
     {
-      indegree[i]--;
-      if(indegree[i]==0)
-      {
-        q.push(i);
-      }
+      indegree[it]--;
+      if(indegree[it]==0)
+        q.push(it);
     }
 
   }
-  return topoSort;
+  return topo;
 
 }
 void solve()
@@ -121,28 +113,40 @@ void solve()
 
   vector<vector<ll>>graph(n+1);
   vector<ll>indegree(n+1);
-
-  loop(m)
+  for(int i=0;i<m;i++)
   {
     ll u,v;
     cin>>u>>v;
-    graph[u].pb(v);
+    graph[u].pb(v);//u-->v
     indegree[v]++;
-
   }
-  vector<ll>vis(n+1);
-  vector<ll>topoSort = topo(indegree,graph);
+  queue<ll>q;
+  q.push(1);
+  vector<ll>ways(n+1);
+  ways[1]=1;
 
-  if(topoSort.size() == n)
+  vector<ll>dist(n+1,1e9);
+  dist[1]=0;
+
+  vector<ll>topo = toposort(graph,indegree);
+
+  // for(auto i:topo)
+  //   cout<<i<<" ";
+
+  for(int i=0;i<topo.size();i++)
   {
-    for(auto i:topoSort)
-      cout<<i<<" ";
+    ll u = topo[i];
+    for(auto v:graph[u])
+    {
+      ways[v]+=ways[u]%MOD;
+      ways[v]=ways[v]%MOD;
+    }
   }
-  else cout<<"IMPOSSIBLE";
+  cout<<ways[n];
 
+ 
 
 }
- 
 int main()
 {
   flash
